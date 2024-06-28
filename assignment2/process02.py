@@ -49,3 +49,10 @@ if __name__ == "__main__":
     print(f'{ctime()} Main          : Basket egg remaining {basket.eggs}')
     duration = time() - start_time
     print(f'{ctime()} Main          : Finished Cooking duration in {duration:0.2f} seconds')
+
+'''
+multi thread
+code นี้เป็นการ เเตก thread
+ครูให้เรามองถาพว่า thread คือพ่อครัวที่ทำงานในห้องครัวห้องเดียว
+ความยากคือพ่อครัวจะตะลุมกันใช้ห้องเดียวกันได้อย่างไร
+'''
