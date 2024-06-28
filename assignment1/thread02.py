@@ -1,5 +1,5 @@
 # running a function with arguments in another thread
-<<<<<<< HEAD
+
 # รันฟังก์ชันในอีกเธรดหนึ่ง
 
 from time import sleep, ctime
