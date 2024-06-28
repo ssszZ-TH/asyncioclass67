@@ -1,4 +1,3 @@
-# Multiprocessing 2 kitkens, 2 cooker, 2 dishes
 # share resources
 
 # Multiprocessing 2 kitkens, 2 cooker, 2 dishes
@@ -50,9 +49,17 @@ if __name__ == "__main__":
     duration = time() - start_time
     print(f'{ctime()} Main          : Finished Cooking duration in {duration:0.2f} seconds')
 
-'''
+''' 
+code นี้เป็นการ multiprocess ด้วยการใช้ class
+
+multi process
+
+ครูเขาให้เรามองว่า process คือห้องครัว 
+มีลูกค้าเข้ามาในร้านกี่คน สั่งใข่เจียวกี่จาน ก็สร้างห้องครัวตามจำนวนจานที่สั่ง
+
+
 multi thread
-code นี้เป็นการ เเตก thread
+
 ครูให้เรามองถาพว่า thread คือพ่อครัวที่ทำงานในห้องครัวห้องเดียว
 ความยากคือพ่อครัวจะตะลุมกันใช้ห้องเดียวกันได้อย่างไร
 '''
