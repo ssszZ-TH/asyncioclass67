@@ -19,17 +19,19 @@ async def main():
     tasks = [
         asyncio.create_task(task_coro('rice')),
         asyncio.create_task(task_coro('noodle')),
-        asyncio.create_task(task_coro('curry'))
+        asyncio.create_task(task_coro('curry')),
+        asyncio.create_task(task_coro('hanattaw')),
     ]
     # wait for the first task to complete
     done, pending = await asyncio.wait(tasks, timeout=10, return_when=asyncio.FIRST_COMPLETED)
 
     # get the result of the first completed task
+    print(f'completed task : {len(done)} task.')
+    
     first_completed_task = done.pop()
-    print('First completed task result:')
     print(first_completed_task.result())
 
-    print(f'Number of tasks still pending: {len(pending)}')
+    print(f'uncomplete task: {len(pending)} task.')
     # for task in pending:
     #     print(f'Pending task: {task}')
 
