@@ -16,7 +16,8 @@ async def main():
     # create many tasks
     tasks = [asyncio.create_task(task_coro(i)) for i in range(10)]
     # wait for all tasks to complete
-    done, pending = await asyncio.wait(tasks, timeout=5)
+    ## done, pending = await asyncio.wait(tasks, timeout=5)
+    done, pending = await asyncio.wait(tasks, timeout=10)
     # report results
     print(f'Done, {len(done)} tasks completed in time')
 
