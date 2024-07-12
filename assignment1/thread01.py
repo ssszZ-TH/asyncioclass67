@@ -24,4 +24,4 @@ thread.start()
 print(f'{ctime()} from main thread')
 
 thread.join()
-
+print('do end of code')
