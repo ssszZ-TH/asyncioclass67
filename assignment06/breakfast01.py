@@ -67,7 +67,7 @@ def main():
 ##########################################################################################################
 
 if __name__ == "__main__":
-    start_cooking = time.perf_counter()
-    main()
-    elapsed = time.perf_counter() - start_cooking
+    start_cooking = time.perf_counter() ## start time
+    main()# main function 
+    elapsed = time.perf_counter() - start_cooking ## end time
     print(f"{time.ctime()} - Breakfast cooked in ", elapsed, "seconds.")
