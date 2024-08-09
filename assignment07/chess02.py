@@ -12,7 +12,11 @@ async def game(x):
     for i in range(move_pairs):
         time.sleep(my_compute_time)
         print(f'board-{x+1} {i+1} judit make move')
-        await asyncio.sleep(opponent_compute_time)
+        if i%2 == 0:
+            await asyncio.sleep(opponent_compute_time)
+        else :
+            asyncio.sleep(opponent_compute_time+0.5)
+            
         print(f'board-{x+1} {i+1} opponent make move')
     print(f'board-{x+1} >>>>>>>>>>>> finish move in {time.perf_counter() - board_start_time} seconds')
     return round(time.perf_counter() - board_start_time)
@@ -22,7 +26,7 @@ async def main():
     tasks = []
     for i in range (opponents):
         tasks.append(asyncio.create_task(game(i)))
-    await asyncio.gather(*tasks)
+    await asyncio.wait(tasks)
     print(f'board exhibit finish in {time.perf_counter() - start_game} seconds')
 
 if __name__ == "__main__":
