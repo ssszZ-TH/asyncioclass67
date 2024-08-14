@@ -23,3 +23,7 @@ def main():
 
 
 main()
+
+'''
+ทำเเบบ synchronous
+'''
