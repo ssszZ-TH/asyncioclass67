@@ -22,8 +22,10 @@ async def main():
     coffee_task = asyncio.create_task(make_coffee())
     eggs_task = asyncio.create_task(fry_eggs())
     
+    # รอให้ task บ้าๆ ทั้ง 2 ตัวทำเสร็จก่อน หน้าที่จะคล้ายๆ thread join
     await coffee_task
     await eggs_task
+    
     print(f"Breakfast is ready in {time()-start} min")
 
 asyncio.run(main())  # Run top-level function concurrently

@@ -1,0 +1,3 @@
+https://pokeapi.co/api/v2/pokemon/{number}
+
+คือ api สำหรับเอา หมายเลขไป get name 
