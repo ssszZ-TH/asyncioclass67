@@ -85,11 +85,16 @@ async def customer_generation(queue: Queue, customers: int):
 
 # Finally, we use the main method to initialize the queue, 
 # producer, and consumer, and start all concurrent tasks.
+
+_queue = 5
+_customer = 80
+_cashier = 5
+
 async def main():
-    customer_queue = Queue(2)
+    customer_queue = Queue(_queue)
     customer_start_time = time.perf_counter()
-    customer_Producer = asyncio.create_task(customer_generation(customer_queue, 3))
-    cachiers = [checkout_customer(customer_queue, i) for i in range(2)]
+    customer_Producer = asyncio.create_task(customer_generation(customer_queue, _customer))
+    cachiers = [checkout_customer(customer_queue, i) for i in range(_cashier)]
     
     await asyncio.gather(customer_Producer, *cachiers)
     print(
@@ -104,10 +109,11 @@ if __name__ == "__main__":
 
 # +--------|------------|-------------|-----------------------|-------------------------    
 # Queue	   | Customer   | Cashier	  |  Time each Customer	  |  Time for all Customers
-# 2	       | 2	        | 2		      |                       |           
-# 2	       | 3	        | 2		      |                       |                                               		
-# 2	       | 4	        | 2		      |                       |           
-# 2	       | 10	        | 3		      |                       |           
-# 5	       | 10	        | 4			  |                       |               
-# 5	       | 20			|             |                       |  >= 8 s
+# 2	       | 2	        | 2		      |   2.0185310999995636  | 2.0193146999999954
+# 2	       | 3	        | 2		      | 2.0007732999993095    | 4.02876920000017   
+# 2	       | 4	        | 2		      | 2.0094516999997722   |  4.044583200000488
+# 2	       | 10	        | 3		      | 2.015505299999859    |  10.17221729999983
+# 5	       | 10	        | 4			  | 2.0213557000006404   |  6.079175099999702
+# 5	       | 10			| 4           | 2.0147680000000037    | 6.0711646999998266
+# 5	       | 80			| 5           |         2            | <= 40s  (32.47975360000055)
 # +--------|------------|-------------|-----------------------|-------------------------    
