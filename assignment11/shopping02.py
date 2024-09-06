@@ -3,6 +3,8 @@ import asyncio
 from asyncio import Queue
 from random import randrange
 
+
+
 # we first implement the Customer and Product classes, 
 # representing customers and products that need to be checked out. 
 # The Product class has a checkout_time attribute, 
@@ -33,24 +35,55 @@ class Customer:
 # we use queue.task_done() to tell the queue that the data has been successfully processed.
 async def checkout_customer(queue: Queue, cashier_number: int):
     while not queue.empty():
+        # ใช้เทคนิค inject var 
+        # เเกนนอน คือ cashia number
+        # เเกนตั้งคือ weight
+        performanceTbl = [
+            [1,0.4,0.4,0.2],
+            [1.1,0.5,0.5,0.3],
+            [0.1,0.1,0.1,0.1],
+            [1.3,0.7,0.7,0.5],
+            [1.4,0.8,0.8,0.6]
+        ]
+        
+        getColumnFromProduct = {
+            'beef':0,
+            'banana':1,
+            'sausage':2,
+            'diapers':3
+        }
+        
+        
+        
         customer: Customer = await queue.get()
         customer_start_time = time.perf_counter()
         print(f'the cashier {cashier_number} is checking out customer {customer.customer_id}...')
 
         for product in customer.products:
+            # ยำนิดหน่อย
+            # ตรงนี้คือจุดที่ต้อง inject if
+            # performance_item = performanceTbl[cashier_number][getColumnFromProduct[product.product_name]]
+            # time_to_doing = product.checkout_time*performance_item
+            time_to_doing = 1+product.checkout_time
+            
             print(
-                f'the cashier {cashier_number}'
-                f'will checkout customer {customer.customer_id}'
-                f'product {product.product_name}'
-                f'in {product.checkout_time} seconds'
+                f'the cashier {cashier_number}',
+                f'will checkout customer {customer.customer_id}',
+                f'product {product.product_name}',
+
+                # จุดที่โดน inject time to doing
+                f'in {time_to_doing} seconds',
+                
             )
-            await asyncio.sleep(product.checkout_time)
+            await asyncio.sleep(time_to_doing)
             
         print(
             f'the cashier {cashier_number}'
             f'finished checking out customer {customer.customer_id}'
             f'in {time.perf_counter() - customer_start_time} seconds'
         )
+        cachiers_score[cashier_number]+=1
+        cachiers_time[cashier_number]+=time_to_doing
         
         queue.task_done()
 
@@ -86,11 +119,14 @@ async def customer_generation(queue: Queue, customers: int):
 # Finally, we use the main method to initialize the queue, 
 # producer, and consumer, and start all concurrent tasks.
 
-_queue = 5
-_customer = 80
+_queue = 10
+_customer = 3
 _cashier = 5
+cachiers_score = [0]*_cashier
+cachiers_time = [0]*_cashier
 
 async def main():
+
     customer_queue = Queue(_queue)
     customer_start_time = time.perf_counter()
     customer_Producer = asyncio.create_task(customer_generation(customer_queue, _customer))
@@ -98,10 +134,15 @@ async def main():
     
     await asyncio.gather(customer_Producer, *cachiers)
     print(
-        f'the supermarket process finished'
-        f'{customer_Producer.result()} customers'
-            f'in {time.perf_counter() - customer_start_time} seconds'
+        f'the supermarket process finished',
+        f'{customer_Producer.result()} customers',
+        f'in {time.perf_counter() - customer_start_time} seconds',
     )
+    for i,score in enumerate(cachiers_score):
+        print(f'cachiers {i} score {score}')
+        
+    for i,taketime in enumerate(cachiers_time):
+        print(f'cachiers {i} do total job time {taketime}')
     
 if __name__ == "__main__":
     asyncio.run(main())
