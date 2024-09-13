@@ -17,6 +17,7 @@ async def checkout_customer(queue: Queue, cashier_number: int):
     start_time = time.perf_counter()
     customers_served = 0
     total_checkout_time = 0
+    outer_checkout_duration = []
 
     while not queue.empty():
         customer :Customer = await queue.get()
@@ -24,12 +25,16 @@ async def checkout_customer(queue: Queue, cashier_number: int):
         
         print(f"Cashier_{cashier_number} starting with Customer_{customer.customer_id}")
         
+        checkout_durations=[]
         for product in customer.products:
             checkout_duration = product.checkout_time
             print(f"Cashier_{cashier_number} processing {product.product_name} for Customer_{customer.customer_id} in {checkout_duration:.2f}s")
             await asyncio.sleep(checkout_duration)
             total_checkout_time += checkout_duration
-
+            checkout_durations.append(checkout_duration)
+            
+        outer_checkout_duration .append(sum(checkout_durations))
+         
         customer_checkout_time = time.perf_counter() - customer_checkout_start
         print(f"Cashier_{cashier_number} finished Customer_{customer.customer_id} in {customer_checkout_time:.2f}s")
         
@@ -37,11 +42,13 @@ async def checkout_customer(queue: Queue, cashier_number: int):
         queue.task_done()
 
     total_time = time.perf_counter() - start_time
+    total_time = sum(outer_checkout_duration)
     if customers_served > 0:
         avg_time_per_customer = total_checkout_time / customers_served
         performance_summary = (
             f"Cashier_{cashier_number} served {customers_served} customers "
             f"in {total_time:.2f}s (avg {avg_time_per_customer:.2f}s per customer)"
+            f" with checkout durations array {checkout_durations}"
         )
     else:
         performance_summary = f"Cashier_{cashier_number} didn't serve any customers"
@@ -86,7 +93,7 @@ async def main():
 # Global variables in camelCase
 queueSize = 3
 customerCount = 10
-cashierCount = 2
+cashierCount = 5
 
 if __name__ == "__main__":
     asyncio.run(main())

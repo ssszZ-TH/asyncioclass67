@@ -18,9 +18,11 @@ async def checkout_customer(queue: Queue, cashier_number: int):
     customers_served = 0
     total_checkout_time = 0
 
+    outer_checkout_duration = []
     while not queue.empty():
         customer :Customer = await queue.get()
         customer_checkout_start = time.perf_counter()
+        inner_checkout_duration = []
         
         print(f"Cashier_{cashier_number} starting with Customer_{customer.customer_id}")
         
@@ -37,6 +39,9 @@ async def checkout_customer(queue: Queue, cashier_number: int):
             print(f'after cal performance equ duration = {checkout_duration}')
             await asyncio.sleep(checkout_duration)
             total_checkout_time += checkout_duration
+            inner_checkout_duration.append(checkout_duration)
+            
+        outer_checkout_duration.append(sum(inner_checkout_duration))
 
         customer_checkout_time = time.perf_counter() - customer_checkout_start
         print(f"Cashier_{cashier_number} finished Customer_{customer.customer_id} in {customer_checkout_time:.2f}s")
@@ -45,6 +50,8 @@ async def checkout_customer(queue: Queue, cashier_number: int):
         queue.task_done()
 
     total_time = time.perf_counter() - start_time
+    total_time = sum(outer_checkout_duration)
+    
     if customers_served > 0:
         avg_time_per_customer = total_checkout_time / customers_served
         performance_summary = (
@@ -96,8 +103,8 @@ async def main():
 # customerCount = 96
 # cashierCount = 5
 
-customerCount = 5
-queueSize = 5
+customerCount = 10
+queueSize = 10
 cashierCount = 5
 
 if __name__ == "__main__":
