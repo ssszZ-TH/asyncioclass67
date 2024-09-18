@@ -1,38 +1,39 @@
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: wurstmeister/zookeeper:3.4.6  # ใช้ภาพ Docker ของ Zookeeper เวอร์ชัน 3.4.6
+    ports:
+      - "2181:2181"  # เปิดพอร์ต 2181 เพื่อให้บริการ Zookeeper สามารถเข้าถึงได้จากภายนอก
+
+  kafka1:
+    image: wurstmeister/kafka:2.13-2.7.0  # ใช้ภาพ Docker ของ Kafka เวอร์ชัน 2.13-2.7.0
+    ports:
+      - "9092:9092"  # เปิดพอร์ต 9092 เพื่อให้บริการ Kafka broker แรกสามารถเข้าถึงได้จากภายนอก
+    environment:
+      KAFKA_BROKER_ID: 1  # กำหนด ID ของ broker เป็น 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # กำหนดให้เชื่อมต่อกับ Zookeeper ที่พอร์ต 2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092  # กำหนดโฮสต์และพอร์ตที่ใช้ในการโฆษณา broker นี้
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT  # กำหนดโปรโตคอลความปลอดภัยเป็น PLAINTEXT
     volumes:
-      - ./zookeeper/data:/var/lib/zookeeper/data
-      - ./zookeeper/datalog:/var/lib/zookeeper/log
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      - ./kafka_data1:/var/run/docker.sock  # เมาท์ Docker socket เพื่อให้ Kafka สามารถดึงข้อมูล IP ของโฮสต์ได้
+
+  kafka2:
+    image: wurstmeister/kafka:2.13-2.7.0  # ใช้ภาพ Docker ของ Kafka เวอร์ชัน 2.13-2.7.0 เช่นเดียวกับ broker แรก
     ports:
-      - 2181:2181
-  
-  kafka:
-    image: confluentinc/cp-kafka:latest
+      - "9093:9092"  # เปิดพอร์ต 9093 เพื่อให้บริการ Kafka broker ที่สองสามารถเข้าถึงได้จากภายนอก
+    environment:
+      KAFKA_BROKER_ID: 2  # กำหนด ID ของ broker เป็น 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # กำหนดให้เชื่อมต่อกับ Zookeeper ที่พอร์ต 2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092  # กำหนดโฮสต์และพอร์ตที่ใช้ในการโฆษณา broker นี้
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT  # กำหนดโปรโตคอลความปลอดภัยเป็น PLAINTEXT
     volumes:
-      - ./kafka/data:/var/lib/kafka/data
-    depends_on:
-      - zookeeper
+      - ./kafka_data2:/var/run/docker.sock  # แก้ไขให้เมาท์ Docker socket ถูกต้อง
+
+  kafkadrop:
+    image: obsidiandynamics/kafdrop:latest  # ใช้ภาพ Docker ของ Kafka Drop เวอร์ชันล่าสุด
     ports:
-      - 9092:9092
+      - "9000:9000"  # เปิดพอร์ต 9000 เพื่อให้บริการ Kafka Drop สามารถเข้าถึงได้จากภายนอก
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://:19092,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    
-  
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:19092"
+      KAFKA_BROKER_CONNECT: kafka1:9092,kafka2:9092  # กำหนดให้ Kafka Drop เชื่อมต่อกับ Kafka brokers
     depends_on:
-      - kafka
+      - kafka1
+      - kafka2
