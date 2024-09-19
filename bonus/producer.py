@@ -1,20 +1,23 @@
-from aiokafka import AIOKafkaProducer
+# https://aiokafka.readthedocs.io/en/stable/
+
+
 import asyncio
+from aiokafka import AIOKafkaProducer
 
 async def send_one():
-    # สร้าง AIOKafkaProducer ที่เชื่อมต่อกับ Kafka broker ที่ localhost:9092
+    # สร้าง instance ของ AIOKafkaProducer
     producer = AIOKafkaProducer(
-        bootstrap_servers='localhost:9092'
+        bootstrap_servers='localhost:9092'  # ระบุที่อยู่ของ Kafka broker
     )
-    # เริ่มต้น producer และเชื่อมต่อกับ broker
+    # เริ่ม producer
     await producer.start()
     try:
-        # ส่งข้อความไปยัง topic "my_topic"
-        await producer.send_and_wait("my_topic", b"Super message")
-        print("Message sent successfully")
+        # ส่งข้อความ
+        await producer.send_and_wait("my_topic", b"Hello, World!")
+        print("Message sent successfully!")
     finally:
-        # รอให้ส่งข้อความที่ค้างอยู่ทั้งหมด หรือหมดอายุ
+        # ปิด producer
         await producer.stop()
 
-# รันฟังก์ชัน send_one ใน event loop
+# รันฟังก์ชัน send_one
 asyncio.run(send_one())

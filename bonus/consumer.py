@@ -1,21 +1,24 @@
 # https://aiokafka.readthedocs.io/en/stable/
-from aiokafka import AIOKafkaConsumer
+
 import asyncio
+from aiokafka import AIOKafkaConsumer
 
 async def consume():
+    # สร้าง instance ของ AIOKafkaConsumer
     consumer = AIOKafkaConsumer(
-        'my_topic', 'my_other_topic',
+        'my_topic',
         bootstrap_servers='localhost:9093',
-        group_id="my-group")
-    # Get cluster layout and join group `my-group`
+        group_id="my-group"
+    )
+    # เริ่ม consumer
     await consumer.start()
     try:
-        # Consume messages
+        # อ่านข้อความ
         async for msg in consumer:
-            print("consumed: ", msg.topic, msg.partition, msg.offset,
-                  msg.key, msg.value, msg.timestamp)
+            print(f"Consumed message: {msg.value.decode('utf-8')}")
     finally:
-        # Will leave consumer group; perform autocommit if enabled.
+        # ปิด consumer
         await consumer.stop()
 
+# รันฟังก์ชัน consume
 asyncio.run(consume())
