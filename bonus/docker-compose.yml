@@ -1,57 +1,57 @@
-version: '3.8'
+version: '3.8'  # ระบุเวอร์ชันของ Docker Compose ที่ใช้
 
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:latest  # ใช้ภาพ Docker ของ Zookeeper จาก Confluent
     volumes:
-      - ./zookeeper/data:/var/lib/zookeeper/data
-      - ./zookeeper/datalog:/var/lib/zookeeper/log
+      - ./zookeeper/data:/var/lib/zookeeper/data  # ติดตั้งโฟลเดอร์ข้อมูล Zookeeper ในเครื่องไปยังโฟลเดอร์ใน container
+      - ./zookeeper/datalog:/var/lib/zookeeper/log  # ติดตั้งโฟลเดอร์ log ของ Zookeeper
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: 2181  # กำหนดพอร์ตที่ Zookeeper จะฟังการเชื่อมต่อจาก client
+      ZOOKEEPER_TICK_TIME: 2000  # กำหนด tick time สำหรับ Zookeeper (ใช้ในการ sync กับ followers)
     ports:
-      - 2181:2181
+      - 2181:2181  # เปิดพอร์ต 2181 ของ container ไปยังพอร์ต 2181 ของ host machine
   
   kafka1:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:latest  # ใช้ภาพ Docker ของ Kafka broker จาก Confluent
     volumes:
-      - ./kafka1/data:/var/lib/kafka/data
+      - ./kafka1/data:/var/lib/kafka/data  # ติดตั้งโฟลเดอร์ข้อมูล Kafka broker ไปยังโฟลเดอร์ใน container
     depends_on:
-      - zookeeper
+      - zookeeper  # ระบุว่า Kafka broker นี้ต้องรันหลังจาก Zookeeper
     ports:
-      - 9092:9092
+      - 9092:9092  # เปิดพอร์ต 9092 ของ container ไปยังพอร์ต 9092 ของ host machine
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://:19091,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19091,EXTERNAL://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_BROKER_ID: 1  # กำหนด broker ID สำหรับ Kafka broker นี้
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # ระบุที่อยู่และพอร์ตของ Zookeeper ที่จะเชื่อมต่อ
+      KAFKA_LISTENERS: INTERNAL://:19091,EXTERNAL://:9092  # กำหนด listeners สำหรับการเชื่อมต่อภายในและภายนอก
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19091,EXTERNAL://localhost:9092  # ระบุที่อยู่ที่ Kafka จะบอกให้ client ใช้ในการเชื่อมต่อ
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT  # กำหนดรูปแบบความปลอดภัยสำหรับแต่ละ listener
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL  # ระบุ listener ที่ใช้สำหรับการสื่อสารระหว่าง brokers
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2  # กำหนด replication factor สำหรับ topic ของ offsets
     
   kafka2:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:latest  # ใช้ภาพ Docker ของ Kafka broker จาก Confluent
     volumes:
-      - ./kafka2/data:/var/lib/kafka/data
+      - ./kafka2/data:/var/lib/kafka/data  # ติดตั้งโฟลเดอร์ข้อมูล Kafka broker ไปยังโฟลเดอร์ใน container
     depends_on:
-      - zookeeper
+      - zookeeper  # ระบุว่า Kafka broker นี้ต้องรันหลังจาก Zookeeper
     ports:
-      - 9093:9092
+      - 9093:9092  # เปิดพอร์ต 9092 ของ container ไปยังพอร์ต 9093 ของ host machine
     environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://:19092,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19092,EXTERNAL://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_BROKER_ID: 2  # กำหนด broker ID สำหรับ Kafka broker นี้
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # ระบุที่อยู่และพอร์ตของ Zookeeper ที่จะเชื่อมต่อ
+      KAFKA_LISTENERS: INTERNAL://:19092,EXTERNAL://:9092  # กำหนด listeners สำหรับการเชื่อมต่อภายในและภายนอก
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19092,EXTERNAL://localhost:9093  # ระบุที่อยู่ที่ Kafka จะบอกให้ client ใช้ในการเชื่อมต่อ
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT  # กำหนดรูปแบบความปลอดภัยสำหรับแต่ละ listener
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL  # ระบุ listener ที่ใช้สำหรับการสื่อสารระหว่าง brokers
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2  # กำหนด replication factor สำหรับ topic ของ offsets
     
   kafdrop:
-    image: obsidiandynamics/kafdrop
+    image: obsidiandynamics/kafdrop  # ใช้ภาพ Docker ของ Kafdrop ซึ่งเป็น UI สำหรับดูข้อมูลใน Kafka
     ports:
-      - "9000:9000"
+      - "9000:9000"  # เปิดพอร์ต 9000 ของ container ไปยังพอร์ต 9000 ของ host machine
     environment:
-      KAFKA_BROKERCONNECT: "kafka1:19091,kafka2:19092"
+      KAFKA_BROKERCONNECT: "kafka1:19091,kafka2:19092"  # ระบุที่อยู่ของ Kafka brokers ที่ Kafdrop จะเชื่อมต่อ
     depends_on:
-      - kafka1
-      - kafka2
+      - kafka1  # ระบุว่า Kafdrop ต้องรันหลังจาก kafka1
+      - kafka2  # ระบุว่า Kafdrop ต้องรันหลังจาก kafka2
