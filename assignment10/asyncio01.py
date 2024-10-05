@@ -42,7 +42,7 @@ async def main():
     # create the shared queue
     queue = asyncio.Queue()
     # run the producer and consumers
-    await asyncio.gather(producer(queue), consumer(queue))
+    await asyncio.gather(producer(queue),producer(queue), consumer(queue))
 
 # start the asyncio program
 asyncio.run(main())

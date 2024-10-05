@@ -7,7 +7,7 @@ from aiokafka import AIOKafkaProducer
 async def send_one():
     # สร้าง instance ของ AIOKafkaProducer
     producer = AIOKafkaProducer(
-        bootstrap_servers='localhost:9092'  # ระบุที่อยู่ของ Kafka broker
+        bootstrap_servers='192.168.43.113:9096'  # ระบุที่อยู่ของ Kafka broker
     )
     # เริ่ม producer
     await producer.start()

@@ -17,24 +17,32 @@ async def checkout_customer(queue: Queue, cashier_number: int):
     start_time = time.perf_counter()
     customers_served = 0
     total_checkout_time = 0
-    outer_checkout_duration = []
 
+    outer_checkout_duration = []
     while not queue.empty():
         customer :Customer = await queue.get()
         customer_checkout_start = time.perf_counter()
+        inner_checkout_duration = []
         
         print(f"Cashier_{cashier_number} starting with Customer_{customer.customer_id}")
         
-        checkout_durations=[]
         for product in customer.products:
             checkout_duration = product.checkout_time
             print(f"Cashier_{cashier_number} processing {product.product_name} for Customer_{customer.customer_id} in {checkout_duration:.2f}s")
+            
+            # สมการบ้าบอ ที่ใช้ในการคำนวน performance
+            # if cashier_number == 2:
+            #     checkout_duration = 0.1
+            # else:
+            #     checkout_duration = round(checkout_duration + (0.1*cashier_number), ndigits=2 )
+            
+            print(f'after cal performance equ duration = {checkout_duration}')
             await asyncio.sleep(checkout_duration)
             total_checkout_time += checkout_duration
-            checkout_durations.append(checkout_duration)
+            inner_checkout_duration.append(checkout_duration)
             
-        outer_checkout_duration .append(sum(checkout_durations))
-         
+        outer_checkout_duration.append(sum(inner_checkout_duration))
+
         customer_checkout_time = time.perf_counter() - customer_checkout_start
         print(f"Cashier_{cashier_number} finished Customer_{customer.customer_id} in {customer_checkout_time:.2f}s")
         
@@ -43,12 +51,12 @@ async def checkout_customer(queue: Queue, cashier_number: int):
 
     total_time = time.perf_counter() - start_time
     total_time = sum(outer_checkout_duration)
+    
     if customers_served > 0:
         avg_time_per_customer = total_checkout_time / customers_served
         performance_summary = (
             f"Cashier_{cashier_number} served {customers_served} customers "
             f"in {total_time:.2f}s (avg {avg_time_per_customer:.2f}s per customer)"
-            f" with checkout durations array {checkout_durations}"
         )
     else:
         performance_summary = f"Cashier_{cashier_number} didn't serve any customers"
@@ -82,8 +90,8 @@ async def main():
     cashiers = [checkout_customer(customer_queue,i) for i in range(cashierCount)]
 
     result = await asyncio.gather(customer_producer, *cashiers)
-    print("-"*100)
-    for i in result[1:]:
+    print('.'*50)
+    for i in result[0:]:
         print(i)
 
     print(f"\nThe supermarket process finished "
@@ -91,20 +99,14 @@ async def main():
           f"in {time.perf_counter() - customer_start_time:.2f} secs")
     
 # Global variables in camelCase
-queueSize = 3
+# queueSize = 5
+# customerCount = 96
+# cashierCount = 5
+
 customerCount = 10
+queueSize = 10
 cashierCount = 5
 
 if __name__ == "__main__":
     asyncio.run(main())
 
-# +--------|------------|-------------|-----------------------|-------------------------    
-# Queue	   | Customer   | Cashier	  |  Time each Customer	  |  Time for all Customers
-# 2	       | 2	        | 2		      |                       |  2.01 s         
-# 2	       | 3	        | 2		      |                       |  4.01 s                                            		
-# 2	       | 4	        | 2		      |                       |  4.01 s         
-# 2	       | 10	        | 3		      |                       |  10.03 s         
-# 3	       | 10	        | 3		      |                       |  8.02 s         
-# 5	       | 10	        | 4			  |                       |  6.02 s             
-# 5	       | 96		    | 5           |                       |  <= 40 s
-# +--------|------------|-------------|-----------------------|------------------------- 

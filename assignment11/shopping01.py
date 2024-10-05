@@ -45,7 +45,7 @@ async def checkout_customer(queue: Queue, cashier_number: int):
                 f'in {product.checkout_time} seconds'
             )
             await asyncio.sleep(product.checkout_time)
-            
+        
         print(
             f'the cashier {cashier_number}'
             f'finished checking out customer {customer.customer_id}'
@@ -59,8 +59,8 @@ async def checkout_customer(queue: Queue, cashier_number: int):
 # We first define a product series and the required checkout time for each product. 
 # Then, we place 0 to 4 products in each customer’s shopping cart.
 def generate_customer(customer_id: int) -> Customer:
-    all_products = [Product('beef', 1),
-                    Product('banana', .4),
+    all_products = [Product('beef',     1),
+                    Product('banana',  .4),
                     Product('sausage', .4),
                     Product('diapers', .2)]
     return Customer(customer_id, all_products)
