@@ -26,6 +26,7 @@ async def consumer(queue1):
     while True:
         item = await queue1.get()
         print(f'get msg -> {item}')
+        await asyncio.sleep(0.1)
     print('Consumer: Done')
 
         
