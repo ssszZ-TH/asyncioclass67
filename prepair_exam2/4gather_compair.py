@@ -5,7 +5,8 @@ import time
 # จาก code เมื่อกี้ เอามาเทียบกับ gather ก็จะทำงานเหมือนกัน
 
 async def task_return_rand():
-    val = random.randint(1, 10)
+    val = random.random()
+    await asyncio.sleep(val)
     print(val)
     return val
 

@@ -2,8 +2,10 @@ import asyncio
 import random
 import time
 
+# จาก function ที่เห็นอยู่ มี async นำหน้า มันจะกลายจาก function เป็น coroutine ทันที มันจะพิเศษตรงที่ เวลาเรียกไม่ต้องรอ
 async def task_return_rand():
-    val = random.randint(1, 10)
+    val = random.random()
+    await asyncio.sleep(val)
     print(val)
     return val
 
@@ -19,7 +21,7 @@ async def task_return_rand():
 async def main():
     tasks = []
     async with asyncio.TaskGroup() as tg:  # ใช้ TaskGroup กับ async with
-        for _ in range(100):
+        for _ in range(5):
             task = tg.create_task(task_return_rand())  # สร้าง task ภายใน TaskGroup
             tasks.append(task)  # เก็บ task ไว้ใน list
     rs = [task.result() for task in tasks]  # ดึงผลลัพธ์หลังจาก task เสร็จ
